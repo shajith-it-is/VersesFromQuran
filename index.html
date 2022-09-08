@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Verses from the Quran</title>
+</head>
+<body class="bg-gray-100 dark:bg-black dark:text-white">
+    <main class="text-center min-h-screen bg-slate-300 dark:bg-slate-900 w-4/5 lg:w-1/2 md:w-3/5 sm:w-4/5 grid place-items-center mx-auto">
+        <h1 class="text-2xl my-6 font-bold italic">
+            بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+        </h1>
+        <h1 class="text-xl mb-6 font-bold italic">
+            In the name of Allah, the Most Gracious, the Most Merciful
+        </h1>
+        <p class="text-2xl my-5 font-bold leading-snug" id="ayah">
+        </p>
+        <p class="text-2xl mt-4">
+            <span id="surahName"></span>
+            <span id="surahNumber"></span> :
+            <span id="ayahInTheSurah"></span>
+            <span></span>
+        </p>
+        <div class="my-4 w-full flex justify-center items-center">
+            <a id="tweet" class="dark:bg-slate-800 bg-slate-200 flex justify-center items-center py-2 px-4 gap-4 rounded-full transition-all ease-in-out duration-300 hover:bg-gray-500" target="_blank" href="http://twitter.com/share?text=">
+                <span class="text-xl">Share as tweet</span>
+                <span><img class="w-4" src="./twitter.png"></span>
+            </a>
+            <a onclick="copyContent()" id="copy-a" class="cursor-pointer dark:bg-slate-800 bg-slate-200 flex justify-center items-center py-2 px-4 gap-4 rounded-full transition-all ease-in-out duration-300 hover:bg-gray-500">
+                <span class="text-xl relative">Copy
+                    <span id="copy" class=" w-full text-xs absolute bottom-10 right-1 hidden">Copied..!</span>
+                </span>
+            </a>
+            <!-- <a class="dark:bg-slate-500 bg-slate-200 flex justify-center items-center py-2 px-4 gap-4 rounded-full transition-all ease-in-out duration-300 hover:bg-gray-500" target="_blank" href="https://twitter.com/messages/compose?recipient_id=&ref_src=twsrc%5Etfw">
+                <span class="text-xl">Open DM</span>
+                <span><img class="w-4" src="./twitter.png"></span>
+            </a> -->
+        </div>
+        <!-- <a href="https://twitter.com/shajith_it_is?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow ds @shajith_it_is</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
+    </main>
+</body>
+<script>
+    var CompleteAyah;
+    async function getAyah() {
+        let myPromise = new Promise(function(resolve) {
+            let req = new XMLHttpRequest();
+            const number = Math.floor(Math.random() * (6236 - 1 + 1) + 1);
+            req.open('GET', "https://api.alquran.cloud/v1/ayah/"+number+"/en.asad");
+            req.onload = function() {
+            if (req.status == 200) {
+                resolve(req.response);
+            } else {
+                resolve("Try different values");
+            }
+            };
+            req.send();
+        });
+        const apiData = JSON.parse(await myPromise);
+        document.getElementById("ayah").textContent = await apiData.data.text;
+        document.getElementById("surahNumber").textContent = await apiData.data.surah.number;
+        document.getElementById("surahName").textContent = await apiData.data.surah.englishName;
+        document.getElementById("ayahInTheSurah").textContent = await apiData.data.numberInSurah;
+        document.getElementById('tweet').href = 'http://twitter.com/share?text=' + await apiData.data.text + ' ' + await apiData.data.surah.englishName + ' ' + await apiData.data.surah.number + ' : ' + await apiData.data.numberInSurah;
+        completeAyah = await apiData.data.text + ' ' + await apiData.data.surah.englishName + ' ' + await apiData.data.surah.number + ' : ' + await apiData.data.numberInSurah;
+    }
+    getAyah();
+    function copyContent() {
+        navigator.clipboard.writeText(completeAyah);
+        document.getElementById('copy').classList.remove('hidden');
+        document.getElementById('copy-a').style.cursor = 'wait';
+        setTimeout(() => {
+            document.getElementById('copy').classList.add('hidden');
+            document.getElementById('copy-a').style.cursor = 'pointer';
+        }, 1000);
+    }
+</script>
+</html>
